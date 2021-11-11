@@ -41,7 +41,7 @@ namespace Viber.Net.Console
                 })
                 .ConfigureServices(services =>
                 {
-                    services.AddHttpClient<IViberHttpClient, ViberHttpClient>(c => 
+                    services.AddHttpClient<IViberHttpClient, ViberHttpClient>(c =>
                     {
                         c.BaseAddress = new Uri("https://chatapi.viber.com/");
                         c.DefaultRequestHeaders.Add("X-Viber-Auth-Token", authToken);
@@ -72,9 +72,13 @@ namespace Viber.Net.Console
         /// <returns></returns>
         private async static Task ExecuteSendMessagesScenario(IViberService viberService)
         {
-            var sendTextMessage = await viberService.SendMessage<SendTextMessageRequest>(new SendTextMessageRequest());
+            var sendTextMessage = await viberService.SendMessage<SendTextMessageRequest>(new SendTextMessageRequest() { Receiver = "gtJWCVrMSPEglng/6swIpw==",
+                Sender = new Sender 
+                {
+                    Name = "Chris Bidis"
+                }, Text = "Welcome my friend!" });
+
             var sendPictureMessage = await viberService.SendMessage<SendPictureMessageRequest>(new SendPictureMessageRequest());
         }
-
     }
 }
