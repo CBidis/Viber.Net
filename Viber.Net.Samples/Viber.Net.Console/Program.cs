@@ -3,9 +3,12 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using System;
 using System.Threading.Tasks;
-using Viber.Net.Contracts;
-using Viber.Net.Implementations;
 using Viber.Net.Models.Requests;
+using Viber.Net.Extensions;
+using System.Threading;
+using Viber.Net.Contracts;
+using System.Net.Http;
+using Viber.Net.Implementations;
 
 namespace Viber.Net.Console
 {
@@ -41,12 +44,16 @@ namespace Viber.Net.Console
                 })
                 .ConfigureServices(services =>
                 {
-                    services.AddHttpClient<IViberHttpClient, ViberHttpClient>(c =>
+                    //services.UseViber<CustomClient, CustomService, HMACSha256Validator>(conf => 
+                    //{
+                    //    conf.AuthToken = authToken;
+                    //    conf.ThrowOnNonSuccessApiResponses = true;
+                    //});
+                    services.UseViber(conf =>
                     {
-                        c.BaseAddress = new Uri("https://chatapi.viber.com/");
-                        c.DefaultRequestHeaders.Add("X-Viber-Auth-Token", authToken);
+                        conf.AuthToken = authToken;
+                        conf.ThrowOnNonSuccessApiResponses = true;
                     });
-                    services.AddScoped<IViberService, ViberService>();
                 });
 
 
@@ -79,6 +86,63 @@ namespace Viber.Net.Console
                 }, Text = "Welcome my friend!" });
 
             var sendPictureMessage = await viberService.SendMessage<SendPictureMessageRequest>(new SendPictureMessageRequest());
+        }
+
+        public class CustomClient : IViberHttpClient
+        {
+            private readonly HttpClient _client;
+
+            public CustomClient(HttpClient client)
+            {
+                _client = client;
+            }
+
+            public Task<TResponse> Post<TRequest, TResponse>(string path, TRequest viberRequest, CancellationToken cancellationToken = default)
+                where TRequest : IViberRequest
+                where TResponse : Models.Responses.IViberResponse
+            {
+                throw new NotImplementedException();
+            }
+        }
+
+        public class CustomService : IViberService
+        {
+            private readonly IViberHttpClient viberHttpClient;
+
+            public CustomService(IViberHttpClient viberHttpClient)
+            {
+                this.viberHttpClient = viberHttpClient;
+            }
+
+            public Task<Models.Responses.GetAccountInfoResponse> GetAccountInfo(GetAccountInfoRequest request, CancellationToken cancellationToken = default)
+            {
+                throw new NotImplementedException();
+            }
+
+            public Task<Models.Responses.GetOnlineUsersStatusResponse> GetOnlineUsersStatus(GetOnlineUsersStatusRequest request, CancellationToken cancellationToken = default)
+            {
+                throw new NotImplementedException();
+            }
+
+            public Task<Models.Responses.GetUserDetailsResponse> GetUserDetails(GetUserDetailsRequest request, CancellationToken cancellationToken = default)
+            {
+                throw new NotImplementedException();
+            }
+
+            public Task<Models.Responses.SetWebhookResponse> RemoveWebhook(RemoveWebhookRequest request, CancellationToken cancellationToken = default)
+            {
+                throw new NotImplementedException();
+            }
+
+            public Task<Models.Responses.SendMessageResponse> SendMessage<TMessageRequest>(TMessageRequest request, CancellationToken cancellationToken = default) where TMessageRequest : ISendMessageViberRequest
+            {
+                throw new NotImplementedException();
+            }
+
+            public Task<Models.Responses.SetWebhookResponse> SetWebhook(SetWebhookRequest request, CancellationToken cancellationToken = default)
+            {
+                throw new NotImplementedException();
+            }
         }
     }
 }

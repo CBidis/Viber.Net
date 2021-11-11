@@ -1,4 +1,5 @@
-﻿using System.Threading;
+﻿using System;
+using System.Threading;
 using System.Threading.Tasks;
 using Viber.Net.Contracts;
 using Viber.Net.Models.Requests;
@@ -13,7 +14,8 @@ namespace Viber.Net
     {
         private readonly IViberHttpClient _viberHttpClient;
 
-        public ViberService(IViberHttpClient viberHttpClient) => _viberHttpClient = viberHttpClient;
+        public ViberService(IViberHttpClient viberHttpClient)
+            => _viberHttpClient = viberHttpClient ?? throw new ArgumentNullException(nameof(viberHttpClient));
 
         public async Task<GetAccountInfoResponse> GetAccountInfo(GetAccountInfoRequest request, CancellationToken cancellationToken = default)
             => await _viberHttpClient.Post<GetAccountInfoRequest, GetAccountInfoResponse>("/pa/get_account_info", request, cancellationToken);

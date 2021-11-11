@@ -15,6 +15,10 @@ namespace Viber.Net.Models.Responses
         /// Success: ok. Failure: invalidUrl, invalidAuthToken, badData, missingData and failure. See error codes table for additional information
         /// </summary>
         string StatusMessage { get; set; }
+        /// <summary>
+        /// Checks whether the call was successful by checking the status code value
+        /// </summary>
+        bool IsSuccess { get; }
     }
 
     /// <summary>
@@ -26,10 +30,6 @@ namespace Viber.Net.Models.Responses
         public int Status { get; set; }
         [JsonPropertyName("status_message")]
         public string StatusMessage { get; set; }
-
-        /// <summary>
-        /// Checks whether the call was successful by checking the status code value
-        /// </summary>
         public bool IsSuccess => Status == 0;
     }
 }

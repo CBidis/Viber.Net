@@ -2,10 +2,11 @@
 using System.Net.Http;
 using System.Text;
 using System.Text.Json;
-using System.Text.Json.Serialization;
 using System.Threading;
 using System.Threading.Tasks;
+using Viber.Net.Configuration;
 using Viber.Net.Contracts;
+using Viber.Net.Exceptions;
 using Viber.Net.Models.Requests;
 using Viber.Net.Models.Responses;
 
@@ -17,18 +18,15 @@ namespace Viber.Net.Implementations
     public class ViberHttpClient : IViberHttpClient
     {
         private readonly HttpClient _httpClient;
-        /// <summary>
-        /// Default Json serializer options
-        /// </summary>
-        protected virtual JsonSerializerOptions _options => new JsonSerializerOptions
-        {
-            Converters =
-            {
-                new JsonStringEnumConverter(JsonNamingPolicy.CamelCase)
-            }
-        };
+        private readonly ViberSettings _settings;
+        private readonly JsonSerializerOptions _options;
 
-        public ViberHttpClient(HttpClient httpClient) => _httpClient = httpClient;
+        public ViberHttpClient(HttpClient httpClient, ViberSettings settings)
+        {
+            _httpClient = httpClient ?? throw new ArgumentNullException(nameof(httpClient));
+            _settings = settings ?? throw new ArgumentNullException(nameof(settings));
+            _options = settings.JsonSerializerOptions;
+        }
 
         public async Task<TResponse> Post<TRequest, TResponse>(string path, TRequest viberRequest, CancellationToken cancellationToken = default)
             where TRequest : IViberRequest
@@ -36,9 +34,16 @@ namespace Viber.Net.Implementations
         {
             var serializedRequest = JsonSerializer.Serialize(viberRequest, typeof(TRequest), _options);
             var httpResponse = await _httpClient.PostAsync(path, new StringContent(serializedRequest, Encoding.UTF8), cancellationToken);
-            var jsonStringResponse = await httpResponse.Content.ReadAsStringAsync();
 
-            return JsonSerializer.Deserialize<TResponse>(jsonStringResponse, _options);
+            var jsonStringResponse = await httpResponse.Content.ReadAsStringAsync();
+            var deserializedResponse = JsonSerializer.Deserialize<TResponse>(jsonStringResponse, _options);
+
+            if (_settings.ThrowOnNonSuccessApiResponses && !deserializedResponse.IsSuccess)
+            {
+                throw new FailedApiResponseException(deserializedResponse.Status, deserializedResponse.StatusMessage);
+            }
+
+            return deserializedResponse;
         }
     }
 }

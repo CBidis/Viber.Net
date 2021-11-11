@@ -1,10 +1,13 @@
 ﻿using Microsoft.AspNetCore.Http;
+using System;
 using System.IO;
 using System.Text;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using System.Threading.Tasks;
+using Viber.Net.Configuration;
 using Viber.Net.Contracts;
+using Viber.Net.Exceptions;
 using Viber.Net.Models.Callbacks;
 
 namespace Viber.Net.Middlewares
@@ -15,6 +18,7 @@ namespace Viber.Net.Middlewares
     public class ViberWebhookMiddleware
     {
         private readonly RequestDelegate _next;
+        private readonly ViberSettings _settings;
         private readonly IHashValidator _hashValidator;
         /// <summary>
         /// viber signature header
@@ -23,30 +27,32 @@ namespace Viber.Net.Middlewares
         /// <summary>
         /// Default Json serializer options
         /// </summary>
-        protected virtual JsonSerializerOptions _options => new JsonSerializerOptions
-        {
-            Converters =
-            {
-                new JsonStringEnumConverter(JsonNamingPolicy.CamelCase)
-            }
-        };
 
-        public ViberWebhookMiddleware(RequestDelegate next, IHashValidator hashValidator)
+        public ViberWebhookMiddleware(RequestDelegate next, ViberSettings settings, IHashValidator hashValidator)
         {
             _next = next;
-            _hashValidator = hashValidator;
+            _hashValidator = hashValidator ?? throw new ArgumentNullException(nameof(hashValidator));
+            _settings = settings ?? throw new ArgumentNullException(nameof(settings));
+            _settings.WebhookRelativePath = settings.WebhookRelativePath ?? throw new ArgumentNullException(nameof(ViberSettings.WebhookRelativePath));
         }
 
         public virtual async Task Invoke(HttpContext context)
         {
             if (IsValidWebhookRequest(context))
             {
+                var computedSignBytes = Array.Empty<byte>();
                 var signature = context.Request.Headers[ViberSingatureHeader];
+
                 var bodyContent = await CopyRequestBodyContentAsync(context.Request);
 
-                var isValidRequest = _hashValidator.IsValid(signature, bodyContent);
-                var deserializedBaseData = JsonSerializer.Deserialize<BaseViberCallbackData>(bodyContent, _options);
+                bool isValidRequest = _hashValidator.IsValid(signature, bodyContent, out computedSignBytes);
 
+                if(_settings.ThrowOnInvalidComputedHash && !isValidRequest)
+                {
+                    throw new InvalidViberHashException(signature, computedSignBytes, bodyContent);
+                }
+
+                var deserializedBaseData = JsonSerializer.Deserialize<BaseViberCallbackData>(bodyContent, _settings.JsonSerializerOptions);
                 context.Response.StatusCode = 200;
                 context.Response.ContentType = "application/json";
                 return;
@@ -84,6 +90,6 @@ namespace Viber.Net.Middlewares
         /// <param name="httpContext"></param>
         /// <returns></returns>
         protected virtual bool IsValidWebhookRequest(HttpContext httpContext) 
-            => httpContext.Request.Headers.ContainsKey(ViberSingatureHeader) && httpContext.Request.Path.Value.Equals("/webhook");
+            => httpContext.Request.Headers.ContainsKey(ViberSingatureHeader) && httpContext.Request.Path.Value.Equals(_settings.WebhookRelativePath);
     }
 }

@@ -1,18 +1,10 @@
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.HttpsPolicy;
-using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using Microsoft.Extensions.Logging;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using Viber.Net.Contracts;
-using Viber.Net.Implementations;
 using Viber.Net.Middlewares;
+using Viber.Net.Extensions;
 
 namespace Viber.Net.WebApi
 {
@@ -30,7 +22,14 @@ namespace Viber.Net.WebApi
         {
 
             services.AddControllers();
-            services.AddSingleton<IHashValidator, HMACSha256Validator>(c => new HMACSha256Validator("your token"));
+
+            services.UseViber(conf =>
+            {
+                conf.AuthToken = "your_token";
+                conf.WebhookRelativePath = "/webhook";
+                conf.ThrowOnNonSuccessApiResponses = true;
+            });
+
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
