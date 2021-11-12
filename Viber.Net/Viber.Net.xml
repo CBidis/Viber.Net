@@ -1,0 +1,788 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>Viber.Net</name>
+    </assembly>
+    <members>
+        <member name="T:Viber.Net.Configuration.ViberSettings">
+            <summary>
+            Viber Configuration object
+            </summary>
+        </member>
+        <member name="P:Viber.Net.Configuration.ViberSettings.BaseUrl">
+            <summary>
+            Viber API base url, has a defailt value of <see href="https://chatapi.viber.com/"/>
+            use official documentation <see href="https://developers.viber.com/docs/api/rest-bot-api/"/> for more information.
+            </summary>
+        </member>
+        <member name="P:Viber.Net.Configuration.ViberSettings.AuthToken">
+            <summary>
+            The authentication token (also known as application key) is a unique and secret account identifier.
+            </summary>
+        </member>
+        <member name="P:Viber.Net.Configuration.ViberSettings.WebhookRelativePath">
+            <summary>
+            use this in conjuction with <see cref="T:Viber.Net.Middlewares.ViberWebhookMiddleware"/>
+            is required in order to use the above middleware.
+            use '/' before the start of your relative path
+            </summary>
+        </member>
+        <member name="P:Viber.Net.Configuration.ViberSettings.JsonSerializerOptions">
+            <summary>
+            Customized Serializer options, default value is null.
+            </summary>
+        </member>
+        <member name="P:Viber.Net.Configuration.ViberSettings.ThrowOnNonSuccessApiResponses">
+            <summary>
+            if set to true, api responses will be validated on service layer 
+            and they will be produce a <see cref="T:Viber.Net.Exceptions.FailedApiResponseException"/>.
+            default value is false, you can check on your layer the status of the response
+            from <see cref="P:Viber.Net.Models.Responses.IViberResponse.IsSuccess"/> method.
+            </summary>
+        </member>
+        <member name="P:Viber.Net.Configuration.ViberSettings.ThrowOnInvalidComputedHash">
+            <summary>
+            if set to true, the <see cref="T:Viber.Net.Middlewares.ViberWebhookMiddleware"/> will produce
+            a <see cref="T:Viber.Net.Exceptions.InvalidViberHashException"/>.
+            default value is true.
+            In case of false proccessing continues.
+            </summary>
+        </member>
+        <member name="T:Viber.Net.Contracts.IHashValidator">
+            <summary>
+            Contract definition of Hash Validator
+            </summary>
+        </member>
+        <member name="M:Viber.Net.Contracts.IHashValidator.IsValid(System.String,System.Byte[],System.Byte[]@)">
+            <summary>
+            validates signature with produces hash value
+            </summary>
+            <param name="value"></param>
+            <param name="signature"></param>
+            <param name="computedSignature">out param computed signature bytes from value bytes</param>
+            <returns>true if valid, false otherwise</returns>
+        </member>
+        <member name="T:Viber.Net.Contracts.IViberHttpClient">
+            <summary>
+            Contract of Viber REST API Client
+            </summary>
+        </member>
+        <member name="M:Viber.Net.Contracts.IViberHttpClient.Post``2(System.String,``0,System.Threading.CancellationToken)">
+            <summary>
+            Executes POST HTTP Requests to Viber Rest API
+            </summary>
+            <typeparam name="TRequest">viber request object that implements <see cref="T:Viber.Net.Models.Requests.IViberRequest"/></typeparam>
+            <typeparam name="TResponse">viber response object that implements <see cref="T:Viber.Net.Models.Responses.IViberResponse"/></typeparam>
+            <param name="path">relative path of request</param>
+            <param name="viberRequest">viber request object</param>
+            <param name="cancellationToken">a cancellation token</param>
+            <returns>deserialized viber response object</returns>
+        </member>
+        <member name="T:Viber.Net.Exceptions.FailedApiResponseException">
+            <summary>
+            Used to indicate invalid API Response codes.
+            </summary>
+        </member>
+        <member name="P:Viber.Net.Exceptions.FailedApiResponseException.Code">
+            <summary>
+            error code received from Viber API
+            </summary>
+        </member>
+        <member name="P:Viber.Net.Exceptions.FailedApiResponseException.Error">
+            <summary>
+            Error description of above code
+            </summary>
+        </member>
+        <member name="M:Viber.Net.Exceptions.FailedApiResponseException.#ctor(System.Int32,System.String)">
+            <summary>
+            Default exception constructor
+            </summary>
+            <param name="code"></param>
+            <param name="error"></param>
+        </member>
+        <member name="T:Viber.Net.Exceptions.InvalidViberHashException">
+            <summary>
+            used to indicate invalid hash computations
+            </summary>
+        </member>
+        <member name="P:Viber.Net.Exceptions.InvalidViberHashException.RawDataReceived">
+            <summary>
+            raw data read from HttpRequest
+            </summary>
+        </member>
+        <member name="P:Viber.Net.Exceptions.InvalidViberHashException.Signature">
+            <summary>
+            Viber signature received
+            </summary>
+        </member>
+        <member name="P:Viber.Net.Exceptions.InvalidViberHashException.ComputedSignatureBytess">
+            <summary>
+            Viber signature received
+            </summary>
+        </member>
+        <member name="M:Viber.Net.Exceptions.InvalidViberHashException.#ctor(System.String,System.Byte[],System.Byte[])">
+            <summary>
+            Default exception constructor
+            </summary>
+        </member>
+        <member name="T:Viber.Net.Extensions.Boostraper">
+            <summary>
+            Extension methods for Injecting Required Services 
+            to Runtime.
+            </summary>
+        </member>
+        <member name="M:Viber.Net.Extensions.Boostraper.UseViber(Microsoft.Extensions.DependencyInjection.IServiceCollection,System.Action{Viber.Net.Configuration.ViberSettings})">
+            <summary>
+            Configures IServiceCollection in order to use <see cref="T:Viber.Net.IViberService"/> through DI Container.
+            </summary>
+            <param name="services"></param>
+            <param name="settings">configuration object for viber</param>
+            <returns></returns>
+        </member>
+        <member name="M:Viber.Net.Extensions.Boostraper.UseViber``3(Microsoft.Extensions.DependencyInjection.IServiceCollection,System.Action{Viber.Net.Configuration.ViberSettings})">
+            <summary>
+            
+            </summary>
+            <typeparam name="TViberHttpClient"></typeparam>
+            <typeparam name="THashValidator"></typeparam>
+            <typeparam name="TViberService"></typeparam>
+            <param name="services"></param>
+            <param name="settings"></param>
+            <returns></returns>
+        </member>
+        <member name="T:Viber.Net.Implementations.HMACSha256Validator">
+            <summary>
+            The signature is HMAC with SHA256 that will use the authentication token as the key and the JSON as the value
+            </summary>
+        </member>
+        <member name="F:Viber.Net.Implementations.HMACSha256Validator._hashAlgorithm">
+            <summary>
+            Hash algorithm.
+            </summary>
+        </member>
+        <member name="T:Viber.Net.Implementations.ViberHttpClient">
+            <summary>
+            Concrete Implementation of <see cref="T:Viber.Net.Contracts.IViberHttpClient"/>
+            </summary>
+        </member>
+        <member name="T:Viber.Net.IViberService">
+            <summary>
+            Viber REST API Services Definition
+            </summary>
+        </member>
+        <!-- Badly formed XML comment ignored for member "M:Viber.Net.IViberService.SetWebhook(Viber.Net.Models.Requests.SetWebhookRequest,System.Threading.CancellationToken)" -->
+        <member name="M:Viber.Net.IViberService.RemoveWebhook(Viber.Net.Models.Requests.RemoveWebhookRequest,System.Threading.CancellationToken)">
+            <summary>
+            Once you set a webhook to your bot your 1-on-1 conversation button will appear and users will be able to access it. 
+            </summary>
+            <param name="request"></param>
+            <param name="cancellationToken"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Viber.Net.IViberService.GetAccountInfo(Viber.Net.Models.Requests.GetAccountInfoRequest,System.Threading.CancellationToken)">
+            <summary>
+            The get_account_info request will fetch the account’s details as registered in Viber.
+            The account admin will be able to edit most of these details from his Viber client.
+            </summary>
+            <param name="request"></param>
+            <param name="cancellationToken"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Viber.Net.IViberService.GetUserDetails(Viber.Net.Models.Requests.GetUserDetailsRequest,System.Threading.CancellationToken)">
+            <summary>
+            The get_user_details request will fetch the details of a specific Viber user based on his unique user ID.
+            The user ID can be obtained from the callbacks sent to the account regarding user’s actions.
+            This request can be sent twice during a 12 hours period for each user ID.
+            </summary>
+            <param name="request"></param>
+            <param name="cancellationToken"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Viber.Net.IViberService.GetOnlineUsersStatus(Viber.Net.Models.Requests.GetOnlineUsersStatusRequest,System.Threading.CancellationToken)">
+            <summary>
+            The get_online request will fetch the online status of a given subscribed account members. 
+            The API supports up to 100 user id per request and those users must be subscribed to the account.
+            </summary>
+            <param name="request"></param>
+            <param name="cancellationToken"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Viber.Net.IViberService.SendMessage``1(``0,System.Threading.CancellationToken)">
+            <summary>
+            The send_message API allows accounts to send messages to Viber users who subscribe to the account. 
+            Sending a message to a user will be possible only after the user has subscribed to the bot. 
+            (see subscribed callback for additional information). You can share your bot with the users via a deeplink.
+            Maximum total JSON size of the request is 30kb.
+            </summary>
+            <typeparam name="TMessageRequest">type of request object</typeparam>
+            <param name="request">request object must implement <see cref="T:Viber.Net.Models.Requests.ISendMessageViberRequest"/> or extend <see cref="T:Viber.Net.Models.Requests.AbstractSendMessageRequest"/></param>
+            <param name="cancellationToken"></param>
+            <returns></returns>
+        </member>
+        <member name="T:Viber.Net.Middlewares.ViberWebhookMiddleware">
+            <summary>
+            Viber Hook Intereceptor Middleware
+            </summary>
+        </member>
+        <member name="F:Viber.Net.Middlewares.ViberWebhookMiddleware.ViberSingatureHeader">
+            <summary>
+            viber signature header
+            </summary>
+        </member>
+        <member name="M:Viber.Net.Middlewares.ViberWebhookMiddleware.#ctor(Microsoft.AspNetCore.Http.RequestDelegate,Viber.Net.Configuration.ViberSettings,Viber.Net.Contracts.IHashValidator)">
+            <summary>
+            Default Json serializer options
+            </summary>
+        </member>
+        <member name="M:Viber.Net.Middlewares.ViberWebhookMiddleware.CopyRequestBodyContentAsync(Microsoft.AspNetCore.Http.HttpRequest)">
+            <summary>
+            Makes A Copy Of RequestBody Raw Bytes
+            </summary>
+            <param name="request"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Viber.Net.Middlewares.ViberWebhookMiddleware.IsValidWebhookRequest(Microsoft.AspNetCore.Http.HttpContext)">
+            <summary>
+            checking header and request path
+            </summary>
+            <param name="httpContext"></param>
+            <returns></returns>
+        </member>
+        <member name="T:Viber.Net.Models.Callbacks.BaseViberCallbackData">
+            <summary>
+            Base Viber Callback properties
+            </summary>
+        </member>
+        <member name="P:Viber.Net.Models.Callbacks.BaseViberCallbackData.Event">
+            <summary>
+            Callback type - which event triggered the callback
+            </summary>
+        </member>
+        <member name="P:Viber.Net.Models.Callbacks.BaseViberCallbackData.Timestamp">
+            <summary>
+            Time of the event that triggered the callback Epoch time
+            </summary>
+        </member>
+        <member name="P:Viber.Net.Models.Callbacks.BaseViberCallbackData.MessageToken">
+            <summary>
+            Unique ID of the message
+            </summary>
+        </member>
+        <member name="P:Viber.Net.Models.Callbacks.BaseViberCallbackData.ChatName">
+            <summary>
+            Chat Hostname identifier
+            </summary>
+        </member>
+        <member name="T:Viber.Net.Models.Callbacks.ViberEvent">
+            <summary>
+            Viber Callbacks Events Type
+            </summary>
+        </member>
+        <member name="T:Viber.Net.Models.Callbacks.ConversationStartedEventData">
+            <summary>
+            Conversation started event fires when a user opens a conversation 
+            with the bot using the “message” button (found on the account’s info screen) or using a deep link.
+            </summary>
+        </member>
+        <member name="P:Viber.Net.Models.Callbacks.ConversationStartedEventData.Type">
+            <summary>
+            The specific type of conversation_started event, open. Additional types may be added in the future
+            </summary>
+        </member>
+        <member name="P:Viber.Net.Models.Callbacks.ConversationStartedEventData.Context">
+            <summary>
+            Any additional parameters added to the deep link used to access the conversation passed as a string.
+            See deep link section for additional information
+            </summary>
+        </member>
+        <member name="P:Viber.Net.Models.Callbacks.ConversationStartedEventData.User">
+            <summary>
+            User Details
+            </summary>
+        </member>
+        <member name="P:Viber.Net.Models.Callbacks.ConversationStartedEventData.Subscribed">
+            <summary>
+            indicated whether a user is already subscribed, true if subscribed and false otherwise
+            </summary>
+        </member>
+        <member name="T:Viber.Net.Models.Callbacks.FailedEventData">
+            <summary>
+            The “failed” callback will be triggered if a message has reached the client but failed any of the client validations.
+            </summary>
+        </member>
+        <member name="P:Viber.Net.Models.Callbacks.FailedEventData.UserId">
+            <summary>
+            Unique Viber user id
+            </summary>
+        </member>
+        <member name="P:Viber.Net.Models.Callbacks.FailedEventData.Description">
+            <summary>
+            A string describing the failure
+            </summary>
+        </member>
+        <member name="T:Viber.Net.Models.Callbacks.MessageReceiptEventData">
+            <summary>
+            Viber offers message status updates for each message sent, allowing the account to be notified 
+            when the message was delivered to the user’s device (delivered status) 
+            and when the conversation containing the message was opened (seen status).
+            </summary>
+        </member>
+        <member name="P:Viber.Net.Models.Callbacks.MessageReceiptEventData.UserId">
+            <summary>
+            Unique Viber user id
+            </summary>
+        </member>
+        <member name="T:Viber.Net.Models.Callbacks.SubscribedEventData">
+            <summary>
+            You will receive a subscribed event when unsubscribed users do the following:
+            1.Open conversation with the bot.
+            2.Tap on the 3-dots button in the top right and then on “Chat Info”.
+            3.Tap on “Receive messages”.
+            </summary>
+        </member>
+        <member name="P:Viber.Net.Models.Callbacks.SubscribedEventData.User">
+            <summary>
+            user details object
+            </summary>
+        </member>
+        <member name="T:Viber.Net.Models.Callbacks.UnSubscribedEventData">
+            <summary>
+            The user will have the option to unsubscribe from the PA. This will trigger an unsubscribed callback.
+            </summary>
+        </member>
+        <member name="P:Viber.Net.Models.Callbacks.UnSubscribedEventData.UserId">
+            <summary>
+            Unique Viber user id
+            </summary>
+        </member>
+        <member name="T:Viber.Net.Models.Requests.GetAccountInfoRequest">
+            <summary>
+            Get Account Info request object, just an empty request object '{}'
+            </summary>
+        </member>
+        <member name="P:Viber.Net.Models.Requests.GetAccountInfoRequest.Default">
+            <summary>
+            Gets default Instance
+            </summary>
+        </member>
+        <member name="T:Viber.Net.Models.Requests.GetOnlineUsersStatusRequest">
+            <summary>
+            Get Online Users Status Request Object
+            </summary>
+        </member>
+        <member name="P:Viber.Net.Models.Requests.GetOnlineUsersStatusRequest.Ids">
+            <summary>
+            Unique Viber user id, 100 ids per request
+            </summary>
+        </member>
+        <member name="T:Viber.Net.Models.Requests.GetUserDetailsRequest">
+            <summary>
+            Get User Details request object
+            </summary>
+        </member>
+        <member name="P:Viber.Net.Models.Requests.GetUserDetailsRequest.Id">
+            <summary>
+            Unique Viber user id
+            </summary>
+        </member>
+        <member name="T:Viber.Net.Models.Requests.IViberRequest">
+            <summary>
+            Marker Interface for all Viber API Request objects
+            </summary>
+        </member>
+        <member name="T:Viber.Net.Models.Requests.RemoveWebhookRequest">
+            <summary>
+            Removing your webhook request object
+            </summary>
+        </member>
+        <member name="P:Viber.Net.Models.Requests.RemoveWebhookRequest.Url">
+            <summary>
+            At the moment there is no option to disable the 1-on-1 conversation from the bot settings,
+            so to disable this option you’ll need to remove the webhook you set for the account.
+            Removing the webhook is done by Posting a set_webhook request with an empty webhook string
+            </summary>
+        </member>
+        <member name="T:Viber.Net.Models.Requests.SendContactMessageRequest">
+            <summary>
+            Send Contact Message Request Object
+            </summary>
+        </member>
+        <member name="P:Viber.Net.Models.Requests.SendContactMessageRequest.Contact">
+            <summary>
+            Contact details object, required
+            </summary>
+        </member>
+        <member name="P:Viber.Net.Models.Requests.ContactDetails.Name">
+            <summary>
+            Name of the contact required. Max 28 characters
+            </summary>
+        </member>
+        <member name="P:Viber.Net.Models.Requests.ContactDetails.PhoneNumber">
+            <summary>
+            Phone number of the contact required. Max 18 characters
+            </summary>
+        </member>
+        <member name="T:Viber.Net.Models.Requests.SendLocationMessageRequest">
+            <summary>
+            Send Location Message Request Object
+            </summary>
+        </member>
+        <!-- Badly formed XML comment ignored for member "P:Viber.Net.Models.Requests.SendLocationMessageRequest.Location" -->
+        <member name="T:Viber.Net.Models.Requests.AbstractSendMessageRequest">
+            <summary>
+            Base Send Message Request Object Properties
+            </summary>
+        </member>
+        <member name="T:Viber.Net.Models.Requests.ISendMessageViberRequest">
+            <summary>
+            
+            </summary>
+        </member>
+        <member name="P:Viber.Net.Models.Requests.ISendMessageViberRequest.Sender">
+            <summary>
+            Sender Details
+            </summary>
+        </member>
+        <member name="P:Viber.Net.Models.Requests.ISendMessageViberRequest.Receiver">
+            <summary>
+            Unique Viber user id
+            </summary>
+        </member>
+        <member name="P:Viber.Net.Models.Requests.ISendMessageViberRequest.MinApiVersion">
+            <summary>
+            Minimal API version required by clients for this message (default 1), optional
+            </summary>
+        </member>
+        <member name="P:Viber.Net.Models.Requests.ISendMessageViberRequest.TrackingData">
+            <summary>
+            Allow the account to track messages and user’s replies. Sent tracking_data value will be passed back with user’s reply
+            </summary>
+        </member>
+        <member name="P:Viber.Net.Models.Requests.ISendMessageViberRequest.Type">
+            <summary>
+            message type, required. Available message types: text, picture, video, file, location, contact, sticker, carousel content and url
+            </summary>
+        </member>
+        <member name="P:Viber.Net.Models.Requests.Sender.Name">
+            <summary>
+            The sender’s name to display, required. Max 28 characters
+            </summary>
+        </member>
+        <member name="P:Viber.Net.Models.Requests.Sender.Avatar">
+            <summary>
+            optional, The sender’s avatar URL
+            </summary>
+        </member>
+        <member name="T:Viber.Net.Models.Requests.MessageType">
+            <summary>
+            Available Message Type definitions
+            </summary>
+        </member>
+        <member name="T:Viber.Net.Models.Requests.SendPictureMessageRequest">
+            <summary>
+            Send Picture Message Request Object
+            </summary>
+        </member>
+        <member name="P:Viber.Net.Models.Requests.SendPictureMessageRequest.Type">
+            <summary>
+            Picture Message Type
+            </summary>
+        </member>
+        <member name="P:Viber.Net.Models.Requests.SendPictureMessageRequest.Text">
+            <summary>
+            The text of the message, required. Max 512 characters
+            </summary>
+        </member>
+        <member name="P:Viber.Net.Models.Requests.SendPictureMessageRequest.Media">
+            <summary>
+            URL of the image (JPEG, PNG, non-animated GIF)
+            required. The URL must have a resource with a .jpeg, .png or .gif file extension as the last path segment. 
+            Example: <see href="http://www.example.com/path/image.jpeg"/>. 
+            Animated GIFs can be sent as URL messages or file messages. Max image size: 1MB on iOS, 3MB on Android.
+            </summary>
+        </member>
+        <member name="P:Viber.Net.Models.Requests.SendPictureMessageRequest.Thumbnail">
+            <summary>
+            URL of a reduced size image (JPEG, PNG, GIF)
+            optional. Recommended: 400x400. Max size: 100kb.
+            </summary>
+        </member>
+        <member name="T:Viber.Net.Models.Requests.SendStickerMessageRequest">
+            <summary>
+            Send Sticker Message Request Object
+            </summary>
+        </member>
+        <member name="P:Viber.Net.Models.Requests.SendStickerMessageRequest.StickerId">
+            <summary>
+            sticker_id Unique Viber sticker ID. For examples visit the sticker IDs page
+            </summary>
+        </member>
+        <member name="T:Viber.Net.Models.Requests.SendTextMessageRequest">
+            <summary>
+            Send Text Message Request Object
+            </summary>
+        </member>
+        <member name="P:Viber.Net.Models.Requests.SendTextMessageRequest.Type">
+            <summary>
+            Text Message Type
+            </summary>
+        </member>
+        <member name="P:Viber.Net.Models.Requests.SendTextMessageRequest.Text">
+            <summary>
+            The text of the message, required. Max length 7,000 characters
+            </summary>
+        </member>
+        <member name="T:Viber.Net.Models.Requests.SendUrlMessageRequest">
+            <summary>
+            Send Url Message Request Object
+            </summary>
+        </member>
+        <member name="P:Viber.Net.Models.Requests.SendUrlMessageRequest.Media">
+            <summary>
+            URL required. Max 2,000 characters
+            </summary>
+        </member>
+        <member name="T:Viber.Net.Models.Requests.SendVideoMessageRequest">
+            <summary>
+            Send Video Message Request Object
+            </summary>
+        </member>
+        <!-- Badly formed XML comment ignored for member "P:Viber.Net.Models.Requests.SendVideoMessageRequest.Media" -->
+        <member name="P:Viber.Net.Models.Requests.SendVideoMessageRequest.Thumbnail">
+            <summary>
+            URL of a reduced size image (JPEG)
+            optional. Max size 100 kb. Recommended: 400x400. Only JPEG format is supported
+            </summary>
+        </member>
+        <member name="P:Viber.Net.Models.Requests.SendVideoMessageRequest.Size">
+            <summary>
+            Size of the video in bytes, required
+            </summary>
+        </member>
+        <member name="P:Viber.Net.Models.Requests.SendVideoMessageRequest.Duration">
+            <summary>
+            Video duration in seconds; will be displayed to the receiver, optional. Max 180 seconds
+            </summary>
+        </member>
+        <member name="T:Viber.Net.Models.Requests.SetWebhookRequest">
+            <summary>
+            Set Web Hook Request Object
+            </summary>
+        </member>
+        <member name="P:Viber.Net.Models.Requests.SetWebhookRequest.Url">
+            <summary>
+            Once you have your token you will be able to set your account’s webhook. This webhook will be used for receiving callbacks and user messages from Viber.
+            </summary>
+        </member>
+        <member name="P:Viber.Net.Models.Requests.SetWebhookRequest.EventTypes">
+            <summary>
+            optional. Indicates the types of Viber events that the account owner would like to be notified about.
+            Sending a set_webhook request with no event_types parameter means getting all events. 
+            Sending a set_webhook request with empty event_types list ("event_types": []) means getting only mandatory events.
+            </summary>
+        </member>
+        <member name="P:Viber.Net.Models.Requests.SetWebhookRequest.SendName">
+            <summary>
+            optional. Indicates whether or not the bot should receive the user name. Default false
+            </summary>
+        </member>
+        <member name="P:Viber.Net.Models.Requests.SetWebhookRequest.SendPhoto">
+            <summary>
+            optional. Indicates whether or not the bot should receive the user photo. Default false
+            </summary>
+        </member>
+        <member name="T:Viber.Net.Models.Responses.GetAccountInfoResponse">
+            <summary>
+            Get Account Info response object
+            </summary>
+        </member>
+        <member name="P:Viber.Net.Models.Responses.GetAccountInfoResponse.Id">
+            <summary>
+            Unique numeric id of the account
+            </summary>
+        </member>
+        <member name="P:Viber.Net.Models.Responses.GetAccountInfoResponse.Name">
+            <summary>
+            Account name
+            </summary>
+        </member>
+        <member name="P:Viber.Net.Models.Responses.GetAccountInfoResponse.Uri">
+            <summary>
+            Unique URI of the Account 	
+            </summary>
+        </member>
+        <member name="P:Viber.Net.Models.Responses.GetAccountInfoResponse.Location">
+            <summary>
+            Account location (coordinates). Will be used for finding accounts near me
+            </summary>
+        </member>
+        <member name="P:Viber.Net.Models.Responses.GetAccountInfoResponse.Country">
+            <summary>
+            Account country, 2 letters country code - ISO ALPHA-2 Code
+            </summary>
+        </member>
+        <member name="P:Viber.Net.Models.Responses.GetAccountInfoResponse.SubscribersCount">
+            <summary>
+            Number of subscribers
+            </summary>
+        </member>
+        <member name="P:Viber.Net.Models.Responses.GetAccountInfoResponse.Members">
+            <summary>
+            Members of the bot’s public chat 
+            </summary>
+        </member>
+        <member name="P:Viber.Net.Models.Responses.Member.Role">
+            <summary>
+            (admin/participant)
+            </summary>
+        </member>
+        <member name="T:Viber.Net.Models.Responses.GetOnlineUsersStatusResponse">
+            <summary>
+            Get Online Users Status Response Object
+            </summary>
+        </member>
+        <member name="P:Viber.Net.Models.Responses.GetOnlineUsersStatusResponse.Users">
+            <summary>
+            List of online users retrieved
+            </summary>
+        </member>
+        <member name="T:Viber.Net.Models.Responses.OnlineUser">
+            <summary>
+            Online User details object
+            </summary>
+        </member>
+        <member name="P:Viber.Net.Models.Responses.OnlineUser.Id">
+            <summary>
+            Unique Viber user id
+            </summary>
+        </member>
+        <member name="P:Viber.Net.Models.Responses.OnlineUser.OnlineStatus">
+            <summary>
+            Online status code.
+            0 for online, 1 for offline, 2 for undisclosed - user set Viber to hide status,
+            3 for try later - internal error, 4 for unavailable - not a Viber user / unsubscribed / unregistered
+            </summary>
+        </member>
+        <member name="P:Viber.Net.Models.Responses.OnlineUser.OnlineStatusMessage">
+            <summary>
+            Online status message
+            </summary>
+        </member>
+        <member name="T:Viber.Net.Models.Responses.GetUserDetailsResponse">
+            <summary>
+            Get User Details Response Object
+            </summary>
+        </member>
+        <member name="P:Viber.Net.Models.Responses.GetUserDetailsResponse.MessageToken">
+            <summary>
+            Unique id of the message
+            </summary>
+        </member>
+        <member name="P:Viber.Net.Models.Responses.GetUserDetailsResponse.User">
+            <summary>
+            user details object
+            </summary>
+        </member>
+        <member name="P:Viber.Net.Models.Responses.User.Id">
+            <summary>
+            Unique Viber user id
+            </summary>
+        </member>
+        <member name="P:Viber.Net.Models.Responses.User.Name">
+            <summary>
+            User’s Viber name
+            </summary>
+        </member>
+        <member name="P:Viber.Net.Models.Responses.User.Avatar">
+            <summary>
+            URL of the user’s avatar
+            </summary>
+        </member>
+        <member name="P:Viber.Net.Models.Responses.User.Country">
+            <summary>
+            User’s country code
+            </summary>
+        </member>
+        <member name="P:Viber.Net.Models.Responses.User.Language">
+            <summary>
+            The language set in the user’s Viber settings. ISO 639-1
+            </summary>
+        </member>
+        <member name="P:Viber.Net.Models.Responses.User.PrimaryDeviceOs">
+            <summary>
+            The operating system type and version of the user’s primary device.
+            </summary>
+        </member>
+        <member name="P:Viber.Net.Models.Responses.User.ApiVersion">
+            <summary>
+            Max API version, matching the most updated user’s device
+            Currently only 1. Additional versions will be added in the future
+            </summary>
+        </member>
+        <member name="P:Viber.Net.Models.Responses.User.ViberVersion">
+            <summary>
+            The Viber version installed on the user’s primary device
+            </summary>
+        </member>
+        <member name="P:Viber.Net.Models.Responses.User.Mcc">
+            <summary>
+            Mobile country code
+            </summary>
+        </member>
+        <member name="P:Viber.Net.Models.Responses.User.Mnc">
+            <summary>
+            Mobile network code
+            </summary>
+        </member>
+        <member name="P:Viber.Net.Models.Responses.User.DeviceType">
+            <summary>
+            The user’s device type
+            </summary>
+        </member>
+        <member name="T:Viber.Net.Models.Responses.IViberResponse">
+            <summary>
+            Contract definition of Viber API Response objects
+            </summary>
+        </member>
+        <member name="P:Viber.Net.Models.Responses.IViberResponse.Status">
+            <summary>
+            0 for success. In case of failure – appropriate failure status number. See error codes table for additional information
+            </summary>
+        </member>
+        <member name="P:Viber.Net.Models.Responses.IViberResponse.StatusMessage">
+            <summary>
+            Success: ok. Failure: invalidUrl, invalidAuthToken, badData, missingData and failure. See error codes table for additional information
+            </summary>
+        </member>
+        <member name="P:Viber.Net.Models.Responses.IViberResponse.IsSuccess">
+            <summary>
+            Checks whether the call was successful by checking the status code value
+            </summary>
+        </member>
+        <member name="T:Viber.Net.Models.Responses.BaseViberResponse">
+            <summary>
+            Implements base properties of all Viber Rest API Responses
+            </summary>
+        </member>
+        <member name="T:Viber.Net.Models.Responses.SendMessageResponse">
+            <summary>
+            Send Message Response Object
+            </summary>
+        </member>
+        <member name="T:Viber.Net.Models.Responses.SetWebhookResponse">
+            <summary>
+            Set webhook Response
+            </summary>
+        </member>
+        <member name="P:Viber.Net.Models.Responses.SetWebhookResponse.EventTypes">
+            <summary>
+            List of event types you will receive a callback for. Should return the same values sent in the request
+            </summary>
+        </member>
+        <member name="T:Viber.Net.ViberService">
+            <summary>
+            Concrete Implementation of <see cref="T:Viber.Net.IViberService"/>
+            </summary>
+        </member>
+    </members>
+</doc>
