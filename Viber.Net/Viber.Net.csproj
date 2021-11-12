@@ -9,6 +9,8 @@
     <RepositoryUrl>https://github.com/CBidis/Viber.Net</RepositoryUrl>
     <PackageIcon>index.png</PackageIcon>
     <PackageIconUrl />
+    <PackageReleaseNotes>This a preview release for testing, most of the core functionality is there.
+please support with your code if you are interested!</PackageReleaseNotes>
   </PropertyGroup>
 
   <ItemGroup>
