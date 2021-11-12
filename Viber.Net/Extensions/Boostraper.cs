@@ -22,7 +22,7 @@ namespace Viber.Net.Extensions
         /// <returns></returns>
         public static IServiceCollection UseViber(this IServiceCollection services, Action<ViberSettings> settings)
         {
-            ///builds configuration settings
+            //builds configuration settings
             var viberConfig = BuildSettings(settings);
             services.AddSingleton(viberConfig);
             services.AddSingleton<IHashValidator, HMACSha256Validator>();
@@ -48,7 +48,7 @@ namespace Viber.Net.Extensions
         public static IServiceCollection UseViber<TViberHttpClient, TViberService, THashValidator>(this IServiceCollection services, Action<ViberSettings> settings)
             where TViberHttpClient : class, IViberHttpClient where TViberService : class, IViberService where THashValidator : class, IHashValidator
         {
-            ///builds configuration settings
+            //builds configuration settings
             var viberConfig = BuildSettings(settings);
             services.AddSingleton(viberConfig);
             services.AddSingleton<IHashValidator, THashValidator>();

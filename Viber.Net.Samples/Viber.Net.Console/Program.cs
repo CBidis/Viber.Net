@@ -17,13 +17,13 @@ namespace Viber.Net.Console
 
         static async Task Main(string[] args)
         {
-            var configurationRoot = new ConfigurationBuilder()
+            _ = new ConfigurationBuilder()
                     .SetBasePath(AppDomain.CurrentDomain.BaseDirectory)
                     .AddJsonFile("appsettings.json", optional: false, reloadOnChange: true)
                     .AddCommandLine(args)
                     .AddEnvironmentVariables().Build();
 
-            var consoleAppHost = CreateDefaultBuilder(configurationRoot).Build();
+            var consoleAppHost = CreateDefaultBuilder().Build();
 
             using IServiceScope serviceScope = consoleAppHost.Services.CreateScope();
             IServiceProvider provider = serviceScope.ServiceProvider;
@@ -34,7 +34,7 @@ namespace Viber.Net.Console
             await ExecuteSendMessagesScenario(viberService);
         }
 
-        static IHostBuilder CreateDefaultBuilder(IConfiguration configuration) => Host.CreateDefaultBuilder()
+        static IHostBuilder CreateDefaultBuilder() => Host.CreateDefaultBuilder()
                 .ConfigureAppConfiguration(app =>
                 {
                     app.SetBasePath(AppDomain.CurrentDomain.BaseDirectory);
