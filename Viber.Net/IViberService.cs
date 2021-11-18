@@ -11,7 +11,7 @@ namespace Viber.Net
     public interface IViberService
     {
         /// <summary>
-        /// Setting the webhook will be done by calling the set_webhook API with a valid & certified URL. 
+        /// Setting the webhook will be done by calling the set_webhook API with a valid and certified URL. 
         /// This action defines the account’s webhook and the type of events the account wants to be notified about.
         /// </summary>
         /// <param name="request"></param>

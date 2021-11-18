@@ -28,7 +28,7 @@ namespace Viber.Net.WebApi
                 conf.AuthToken = "your_token";
                 conf.WebhookRelativePath = "/webhook";
                 conf.ThrowOnNonSuccessApiResponses = true;
-            });
+            }).AddWebHookHandler<WebhookHandler>();
 
         }
 

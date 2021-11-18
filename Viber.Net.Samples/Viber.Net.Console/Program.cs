@@ -78,7 +78,7 @@ namespace Viber.Net.Console
         {
             var sendTextMessage = await viberService.SendMessage<SendTextMessageRequest>(new SendTextMessageRequest()
             {
-                Receiver = "gtJWCVrMSPEglng/6swIpw==",
+                Receiver = "nanda_nani_nanda",
                 Sender = new Sender
                 {
                     Name = "Chris Bidis"

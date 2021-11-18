@@ -5,6 +5,7 @@ using System.Text.Json.Serialization;
 using Viber.Net.Configuration;
 using Viber.Net.Contracts;
 using Viber.Net.Implementations;
+using Viber.Net.Middlewares;
 
 namespace Viber.Net.Extensions
 {
@@ -61,6 +62,18 @@ namespace Viber.Net.Extensions
 
             return services;
         }
+
+        /// <summary>
+        /// Registers concrete singleton implementation of <see cref="IHookHandler"/> that will be consumed
+        /// through <see cref="ViberWebhookMiddleware"/> in order to process your callbacks data.
+        /// Don't forget to register <see cref="ViberWebhookMiddleware"/> using 
+        /// <code>app.UseMiddleware&lt;ViberWebhookMiddleware&gt;()</code>
+        /// </summary>
+        /// <typeparam name="THandler">type of <see cref="IHookHandler"/>></typeparam>
+        /// <param name="services"></param>
+        /// <returns></returns>
+        public static IServiceCollection AddWebHookHandler<THandler>(this IServiceCollection services) 
+            where THandler : class, IHookHandler => services.AddSingleton<IHookHandler, THandler>();
 
         private static JsonSerializerOptions GetOrSetDefaultConverters(JsonSerializerOptions jsonSerializerOptions)
         {

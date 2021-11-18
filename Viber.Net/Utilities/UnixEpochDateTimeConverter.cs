@@ -1,8 +1,6 @@
 ﻿using System;
-using System.Globalization;
 using System.Text.Json;
 using System.Text.Json.Serialization;
-using System.Text.RegularExpressions;
 
 namespace Viber.Net.Utilities
 {
@@ -20,9 +18,7 @@ namespace Viber.Net.Utilities
         public override void Write(Utf8JsonWriter writer, DateTime value, JsonSerializerOptions options)
         {
             long unixTime = Convert.ToInt64((value - s_epoch).TotalMilliseconds);
-
-            string formatted = FormattableString.Invariant($"/Date({unixTime})/");
-            writer.WriteStringValue(formatted);
+            writer.WriteNumberValue(unixTime);
         }
     }
 }

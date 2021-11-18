@@ -12,6 +12,7 @@ namespace Viber.Net.Models.Requests
         /// URL of the video (MP4, H264)
         /// required. Max size 26 MB. Only MP4 and H264 are supported.
         /// The URL must have a resource with a .mp4 file extension as the last path segment. Example: http://www.example.com/path/video.mp4
+        /// </summary> 
         [JsonPropertyName("media")]
         public string Media { get; set; }
         /// <summary>

@@ -7,7 +7,7 @@ namespace Viber.Net.Models.Callbacks
     /// <summary>
     /// Base Viber Callback properties
     /// </summary>
-    public class BaseViberCallbackData
+    public class BaseViberCallbackData : ICallBackData
     {
         /// <summary>
         /// Callback type - which event triggered the callback
@@ -30,7 +30,17 @@ namespace Viber.Net.Models.Callbacks
         /// </summary>
         [JsonPropertyName("chat_hostname")]
         public string ChatName { get; set; }
+    }
 
+    /// <summary>
+    /// contract of base callback data.
+    /// </summary>
+    public interface ICallBackData
+    {
+        ViberEvent Event { get; set; }
+        DateTime Timestamp { get; set; }
+        long MessageToken { get; set; }
+        string ChatName { get; set; }
     }
 
     /// <summary>
