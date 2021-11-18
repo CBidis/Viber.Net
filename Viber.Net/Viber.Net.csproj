@@ -4,7 +4,8 @@
 		<TargetFrameworks>netstandard2.0;netstandard2.1</TargetFrameworks>
 		<GeneratePackageOnBuild>true</GeneratePackageOnBuild>
 		<GenerateDocumentationFile>true</GenerateDocumentationFile>
-		<Description>A .NET implementation regarding the Viber REST API.</Description>
+		<Description>A .NET implementation regarding the Viber REST API.
+if you are interested please support me and leave a star here https://github.com/CBidis/Viber.Net/</Description>
 		<Authors>Chris Bidis</Authors>
 		<PackageProjectUrl>https://github.com/CBidis/Viber.Net</PackageProjectUrl>
 		<RepositoryUrl>https://github.com/CBidis/Viber.Net</RepositoryUrl>
@@ -14,6 +15,9 @@
 
 	<PropertyGroup>
 		<DocumentationFile>bin\$(Configuration)\$(TargetFramework)\$(AssemblyName).xml</DocumentationFile>
+		<PackageTags>viber;net;cbidis;viber bot;viber;messaging;api</PackageTags>
+		<PackageReleaseNotes>initial release of 1.0.1  that contains all basic abilities.</PackageReleaseNotes>
+		<Version>1.0.1</Version>
 	</PropertyGroup>
 
 	<ItemGroup>
